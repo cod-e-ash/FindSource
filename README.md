@@ -1,7 +1,7 @@
-# RPG Auto Screen Generator
+# RPG Find Source
 
 This is part of my **`RPG Utils`** series to help overcome some of the day-to-day activities which can be automated.
-Those are starting with developemnt, I would advice not to use this utility, but to build their own code. For he rest, here's a simple soultion that will save you and your company lots of time. This utility will develop the subfile screens, maintainance screens and all the logic behind the program within few minutes. 
+Developers, QA, Analyst or anyone who wants to access source code in RPG _rejoice_. This will help you to find any source within many libraries with just one command. Just set the library list once and enjoy.
 
 ## Getting Started
 
@@ -17,24 +17,32 @@ CRTSRCPF RPGUTILS
 
 ### Program and Object Descriptions  
   
-  * `AUTOSCRAF`  
-  This is a PF source which will hold the data to generate programs and screens.  
-  Create four files based on this source AUTOSCRAF1, AUTOSCRAF2, AUTOSCRAF3, AUTOSCRAF4  
+  * `LIBLISTF`  
+  This is a PF source which will hold the library list data.  
 
-  * `AUTOSCRAF1/2/3/4`  
-  This contain the data to be inserted into source files created before. (Use name as reference)  
+  * `LIBLISTP`  
+  This is the program to maintain library list.  
 
-  * `AUTOSCRC`  
-  This is a dirver CL program.  
+  * `LIBLISTD`  
+  Display file required for library list program.  
 
-  * `AUTOSCRC`  
-  Command file. Use this source to create the command, use any name, but make sure you are calling the above CL as program.  
+  * `LIBLISTCMD`  
+  Command source file.  
 
-  * `AUTOSCRP`  
-  Main program that contains all the logic.  
+  * `VALLSRCC`
+  Driver CL program.
 
+  * `VALLSRCCMD`
+  Driver command source file.
+  
+  * `VALLSRCD`
+  Display file used by main program.
+  
+  * `VALLSRCP`
+  Main program.
+  
   * `CPYBK`  
-  A copybook to store prototype definations and other. If you use any other library that RPGUTILS, please change the path in above RPG program for this copy book.  
+  A copybook to store prototype definations and other. If you use any other library that RPGUTILS, please change the path in above RPG program/s for this copy book.  
 
 
 ### Installing
@@ -49,8 +57,6 @@ Upload all files to AS400 server, use ftp. <em>DO NOT CHANGE THE MODE TO BINARY<
   cd YOURLIB.LIB
   cd RPGUTILS.FILE
   mput *.MBR
-  cd /home/YOURLIB/
-  mput *.txt
   disconnect
   quit
 ```
