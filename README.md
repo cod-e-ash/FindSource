@@ -42,7 +42,7 @@ CRTSRCPF RPGUTILS
   Main program.  
   
   * `CPYBK`  
-  A copybook to store prototype definations and other. If you use any other library that RPGUTILS, please change the path in above RPG program/s for this copy book.  
+  A copybook to store prototype definitions and other. If you use any other library that RPGUTILS, please change the path in above RPG program/s for this copy book.  
 
 
 ### Installing
@@ -61,7 +61,7 @@ Upload all files to AS400 server, use ftp. <em>DO NOT CHANGE THE MODE TO BINARY<
   quit
 ```
 **Step 2.**
-Change the atribute type accordingly once uploaded.
+Change the attribute type accordingly once uploaded.
 ```
   LIBLISTCMD  CMD     
   LIBLISTD    DSPF    
@@ -111,7 +111,7 @@ PROGRAM/DATA.:    (P/D/B)
 ```
 Library is the library you want to add. Leave the sequence blank for now. Used for search sequence of libraries.  
 
-**O**bject or **S**ource or **B**oth. Since library list is used by my other utilites, this is some extra information for now.  
+**O**bject or **S**ource or **B**oth. Since library list is used by my other utilities, this is some extra information for now.  
 Object library would be library which contains objects only. Source would be for source. Both for Both :)  
 You can enter 'B'.
 
