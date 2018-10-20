@@ -1,0 +1,10 @@
+/* PROJECT     : AB UTILITIES (LIC:XXXXXX)                                  */                              
+/* PROGRAMMER  : ASHISH BAGADDEO                                            */                              
+/* DATE        : 01/01/2014                                                 */                              
+/* DESCRIPTION : COMMAND FILE                                               */                              
+/* © COPYRIGHT : ICORE®            MAILTO: SUPPORT@ICORE.CO.IN              */                              
+/*--------------------------------------------------------------------------*/                              
+             CMD        PROMPT('FIND ALL SOURCE')                                                           
+             PARM       KWD(OBJNAME) TYPE(*CHAR) LEN(10) +                                                  
+                          PROMPT('Object Name')                                                             
+    ‚‚*---------------------------------------------------------------------*                               

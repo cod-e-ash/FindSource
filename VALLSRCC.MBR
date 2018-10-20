@@ -1,0 +1,36 @@
+/*‚Project     : AB Utilities (LIC:xxxxxx)                                  */                              
+/*‚Programmer  : Ashish Bagaddeo                                            */                              
+/*‚Date        : 01/01/2014                                                 */                              
+/*‚Description : This program will take source member name as input ,       */                              
+/*‚              stop logging of messages and call VALLSRCP to find and     */                              
+/*‚              display all source files                                   */                              
+/*‚© Copyright : iCORE®            mailto: support@icore.co.in              */                              
+/*‚-------------------------------------------------------------------------*/                              
+                                                                                                            
+             PGM        PARM(&MBRNM)                                                                        
+                                                                                                            
+             DCL        VAR(&MBRNM)    TYPE(*CHAR) LEN(10)                                                  
+             DCL        VAR(&JOBNM)    TYPE(*CHAR) LEN(10)                                                  
+             DCL        VAR(&FNDFL)    TYPE(*LGL)                                                           
+             DCL        VAR(&LOGLVL)   TYPE(*CHAR) LEN(1)                                                   
+             DCL        VAR(&LOGSEV)   TYPE(*DEC) LEN(2 0)                                                  
+             DCL        VAR(&LOGTYPE)  TYPE(*CHAR) LEN(10)                                                  
+             DCL        VAR(&LOGCLPGM) TYPE(*CHAR) LEN(10)                                                  
+             COPYRIGHT  TEXT('iCORE® - Ashish Bagaddeo')                                                    
+                                                                                                            
+             RTVJOBA    LOGLVL(&LOGLVL) LOGSEV(&LOGSEV) +                                                   
+                          LOGTYPE(&LOGTYPE) LOGCLPGM(&LOGCLPGM)                                             
+                                                                                                            
+             CHGJOB     LOG(0 0 *NOLIST) LOGCLPGM(*NO)                                                      
+                                                                                                            
+             CALL       PGM(VALLSRCP) PARM(&MBRNM &FNDFL)                                                   
+                                                                                                            
+             IF         COND(&FNDFL = '0') THEN(DO)                                                         
+             SNDPGMMSG  MSG('SOURCE NOT FOUND IN ANY LIBRARY') +                                            
+                          MSGTYPE(*INFO)                                                                    
+             ENDDO                                                                                          
+                                                                                                            
+EXIT:        CHGJOB     LOG(&LOGLVL &LOGSEV &LOGTYPE) +                                                     
+                          LOGCLPGM(&LOGCLPGM)                                                               
+             ENDPGM                                                                                         
+/*--------------------------------------------------------------------------*/                              

@@ -1,0 +1,15 @@
+     ‚*-----------------------------------------------------------------*/
+     ‚* Project      : AB Utilities                                         *
+     ‚* Programmer   : Ashish Bagaddeo                                      *
+     ‚* Date         : 18/04/2014                                           *
+     ‚* Description  : Library List                                         *
+     ‚* × Copyright  : iCORE®  mailto: support@icore.co.in                  *
+     ‚*---------------------------------------------------------------------*
+A               R SYSPARMR
+A                 LIBSEQ         5  0       COLHDG('Sequence')
+A                 LIBNAM        10          COLHDG('Library')
+A                 LIBTY1         1          COLHDG('Obj/Src/Both Lib')
+A                 LIBTY2         1          COLHDG('Pgm/Dta/Both Lib')
+A                 ADDDT           Z         COLHDG('Add Date')
+A               K LIBSEQ
+A               K LIBNAM

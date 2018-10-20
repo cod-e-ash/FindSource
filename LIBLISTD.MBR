@@ -1,0 +1,101 @@
+     A* PROJECT      : AB UTILITIES        (LIC:XXXXXX)                     *                               
+     A* PROGRAMMER   : ASHISH BAGADDEO                                      *                               
+     A* DATE         : 16/04/2014                                           *                               
+     A* DESCRIPTION  : DISPLAY FILE TO ADD/EDIT LIB LIST                    *                               
+     A* × COPYRIGHT  : ICORE®  MAILTO: ASHISH§BAGADDEO.COM                  *                               
+     A*---------------------------------------------------------------------*                               
+     A                                      DSPSIZ(24 80 *DS3)                                              
+     A                                      CA03(03)                                                        
+     A                                      CA05(05)                                                        
+     A                                      CA06(06)                                                        
+     A                                      CA12(12)                                                        
+     ‚*---------------------------------------------------------------------*                               
+     A          R HEADER                                                                                    
+     ‚*---------------------------------------------------------------------*                               
+     A                                  2  2USER                                                            
+     A                                  2 33'LIBRARY LIST'                                                  
+     A                                      COLOR(WHT)                                                      
+     A                                  2 72DATE                                                            
+     A                                      EDTCDE(Y)                                                       
+     A                                  3 72TIME                                                            
+     A                                  5  2'TYPE OPTIONS, PRESS ENTER.'                                    
+     A                                      COLOR(BLU)                                                      
+     A                                  6  3'4=DELETE'                                                      
+     A                                      COLOR(BLU)                                                      
+     ‚*---------------------------------------------------------------------*                               
+     A          R SRCSFL                    SFL                                                             
+     ‚*---------------------------------------------------------------------*                               
+     A            SRCOPT         1A  B  9  2                                                                
+     A            SRCLIB        10A  O  9  6                                                                
+     A            SRCSEQ         5  0O  9 21EDTCDE(4)                                                       
+     A            SRCTY1         1A  O  9 31                                                                
+     A            SRCTY2         1A  O  9 40                                                                
+     A            SRCDAT          Z  O  9 46                                                                
+     A                                                                                                      
+     ‚*---------------------------------------------------------------------*                               
+     A          R SRCSFLCTL                 SFLCTL(SRCSFL)                                                  
+     ‚*---------------------------------------------------------------------*                               
+     A                                      OVERLAY                                                         
+     A  30                                  SFLDSP                                                          
+     A                                      SFLDSPCTL                                                       
+     A  31                                  SFLCLR                                                          
+     A  32                                  SFLEND(*MORE)                                                   
+     A                                      SFLCSRRRN(&RELRCD)                                              
+     A                                      SFLSIZ(0020)                                                    
+     A                                      SFLPAG(008)                                                     
+     A            RELRCD         5S 0H                                                                      
+     A            RCDNBR         4S 0H      SFLRCDNBR                                                       
+     A                                  8  2'OPT'                                                           
+     A                                      COLOR(WHT)                                                      
+     A                                  8  6'LIBRARY'                                                       
+     A                                      COLOR(WHT)                                                      
+     A                                  8 18'SEQUENCE'                                                      
+     A                                      COLOR(WHT)                                                      
+     A                                  8 28'OBJ/SRC'                                                       
+     A                                      COLOR(WHT)                                                      
+     A                                  8 37'PGM/DTA'                                                       
+     A                                      COLOR(WHT)                                                      
+     A                                  8 46'ADD TIMESTAMP'                                                 
+     A                                      COLOR(WHT)                                                      
+     ‚*---------------------------------------------------------------------*                               
+     A          R FOOTER                                                                                    
+     ‚*---------------------------------------------------------------------*                               
+     A                                      OVERLAY                                                         
+     A                                 22  2'F3=EXIT'                                                       
+     A                                      COLOR(BLU)                                                      
+     A                                 22 11'F5=REFRESH'                                                    
+     A                                      COLOR(BLU)                                                      
+     A                                 22 23'F6=ADD'                                                        
+     A                                      COLOR(BLU)                                                      
+     A                                 22 31'F12=CANCEL'                                                    
+     A                                      COLOR(BLU)                                                      
+     A            ERRMSG        70A  O 23  2COLOR(WHT)                                                      
+     A                                 24 63'× ASHISH BAGADDEO'                                             
+     ‚*---------------------------------------------------------------------*                               
+     A          R WINREC                                                                                    
+     ‚*---------------------------------------------------------------------*                               
+     A                                      OVERLAY                                                         
+     A                                      WINDOW(7 18 10 30)                                              
+     A                                  1 11'ADD LIBRARY'                                                   
+     A                                      COLOR(WHT)                                                      
+     A                                  3  3'LIBRARY......:'                                                
+     A            LIBNAM        10A  B  3 18                                                                
+     A                                  4  3'SEQUENCE.....:'                                                
+     A            LIBSEQ         5A  B  4 18                                                                
+     A                                  5  3'OBJECT/SOURCE:'                                                
+     A            LIBTY1         1A  B  5 18                                                                
+     A                                  5 21'(O/S/B)'                                                       
+     A                                  6  3'PROGRAM/DATA.:'                                                
+     A            LIBTY2         1A  B  6 18                                                                
+     A                                  6 21'(P/D/B)'                                                       
+     A            ERRMSG2       25A  O  8  3                                                                
+     A                                      COLOR(WHT)                                                      
+     A                                  9  3'F12=CANCEL'                                                    
+     A                                      COLOR(BLU)                                                      
+     A          R LIBLISTR                                                                                  
+     A            LIBSEQ        10A         COLHDG('Sequence')                                              
+     A            LIBNAM        10A                                                                         
+     A            LIBTY1         1A                                                                         
+     A            LIBTY2         1A                                                                         
+     A            ADDDT           Z                                                                         
+     ‚**********************************************************************                                

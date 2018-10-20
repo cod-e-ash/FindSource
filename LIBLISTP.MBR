@@ -1,0 +1,423 @@
+     Ç* Project     : AB Utilities (LIC:xxxxxx)                                                             
+     Ç* Programmer  : Ashish Bagaddeo                                      *                                
+     Ç* Date        : 01/01/2014                                           *                                
+     Ç* Description : Library List Maintainance Program                    *                                
+     Ç*                                                                    *                                
+     Ç* ◊ Copyright  : iCOREÆ            mailto: support@icore.co.in       *                                
+     Ç**********************************************************************                                
+     H Debug Option(*NoDebugIO)                                                                             
+     H CopyRight('iCOREÆ - Ashish Bagaddeo')                                                                
+                                                                                                            
+     Ç* File Specification                                                                                  
+     FLIBLISTD  CF   E             WORKSTN SFILE(SRCSFL:SFLRRN)                                             
+                                                                                                            
+     Ç* Variable Declaration                                                                                
+     DVarDs1           DS                                                                                   
+     D Wk_Command                   300    Inz(*Blanks)                                                     
+     D Wk_ChkLib                     10    Inz(*Blanks)                                                     
+     D PrvRELRCD                      5S 0 Inz(*Zeros)                                                      
+     D Wk_CmdLen                     15P 5 Inz(*Zeros)                                                      
+     D SFLRRN                         4  0 Inz(*Zeros)                                                      
+     D Wk_MAXSEQ                      5  0 Inz(*Zeros)                                                      
+     D LIBSEQN                        5  0 Inz(*Zeros)                                                      
+                                                                                                            
+     Ç* Indicators                                                                                          
+     D Wk_ChkFail                      N   Inz(*Off)                                                        
+     D InKyPtr         S               *   Inz(%ADDR(*IN))                                                  
+     DSubFileInd       DS            99    Based(InKyPtr)                                                   
+     D SflDsp                          N   Overlay(SubFileInd: 30)                                          
+     D SflClr                          N   Overlay(SubFileInd: 31)                                          
+     D SflEnd                          N   Overlay(SubFileInd: 32)                                          
+                                                                                                            
+     Ç* Constants                                                                                           
+     DUCase            C                   CONST('ABCDEFGHIJKLMNOPQRSTUVWXYZ')                              
+     DLCase            C                   CONST('abcdefghijklmnopqrstuvwxyz')                              
+                                                                                                            
+     Ç* Data Structures                                                                                     
+                                                                                                            
+     Ç* Subfile Data Structure                                                                              
+     DSubFileDs        DS                                                                                   
+     DSRCLIB                         10                                                                     
+     DSRCSEQ                          5  0                                                                  
+     DSRCTY1                          1                                                                     
+     DSRCTY2                          1                                                                     
+     DSRCDAT                           Z                                                                    
+                                                                                                            
+     Ç* Cursor Data Structure                                                                               
+     DSRCOBJDS         DS                                                                                   
+     DSSeq                            5  0                                                                  
+     DSLib                           10                                                                     
+     DSTy1                            1                                                                     
+     DSTy2                            1                                                                     
+     DSDat                             Z                                                                    
+                                                                                                            
+     Ç* Prototypes                                                                                          
+      /Copy RPGUTILS,CPYBK                                                                                     
+                                                                                                            
+     D LIBLISTP        PI                                                                                   
+     D FndFlg                          N                                                                    
+                                                                                                            
+      /Free                                                                                                 
+                                                                                                            
+         // ----------------------------------------------------------                                      
+         //                       Program Starts                     -                                      
+         // ----------------------------------------------------------                                      
+                                                                                                            
+         // Initialize Variables                                                                            
+         // Set SQL Options                                                                                 
+            Exec SQL                                                                                        
+               SET OPTION COMMIT = *NONE, CLOSQLCSR = *ENDMOD;                                              
+                                                                                                            
+         // Load Subfile & Display                                                                          
+            ExSr $LoadSF;                                                                                   
+                                                                                                            
+         // Exit Program                                                                                    
+            ExSr $ExitPgm;                                                                                  
+                                                                                                            
+                                                                                                            
+         // ----------------------------------------------------------                                      
+         //                         Subroutines                      -                                      
+         // ----------------------------------------------------------                                      
+                                                                                                            
+         // ----------------------------------------                                                        
+         // $LoadSF - Load Subfile                                                                          
+         // ----------------------------------------                                                        
+            BegSr $LoadSF;                                                                                  
+                                                                                                            
+            // Declare Cursor & Open Cursor                                                                 
+               ExSr $DecCurSor;                                                                             
+                                                                                                            
+            // Find all source files and display                                                            
+               Exsr $Display;                                                                               
+                                                                                                            
+            // Close Cursor                                                                                 
+               ExSr $CloseCur;                                                                              
+                                                                                                            
+            EndSr;                                                                                          
+                                                                                                            
+         // ----------------------------------------                                                        
+         // $Display - Display Screen                                                                       
+         // ----------------------------------------                                                        
+            BegSr $Display;                                                                                 
+                                                                                                            
+               ExSr $LoadSubFile;                                                                           
+                                                                                                            
+            // If SflDsp = *Off;                                                                            
+                                                                                                            
+                  DoU *In03 = *On or *In12;                                                                 
+                     If PrvRELRCD > 0;                                                                      
+                        RCDNBR = PrvRELRCD;                                                                 
+                        PrvRELRCD = 0;                                                                      
+                     EndIf;                                                                                 
+                     Write HEADER;                                                                          
+                     Write FOOTER;                                                                          
+                     ExFmt SRCSFLCTL;                                                                       
+                                                                                                            
+                     If *In03 <> *On And *In12 <> *On;                                                      
+                                                                                                            
+                        ERRMSG = *Blanks;                                                                   
+                                                                                                            
+                     // When F5 is pressed (Refresh)                                                        
+                        If *In05 = *On;                                                                     
+                           ExSr $LoadSF;                                                                    
+                        EndIf;                                                                              
+                                                                                                            
+                     // When F6 (Add) Option is Select                                                      
+                        If *In06 = *On;                                                                     
+                           ExSr $Add;                                                                       
+                           ExSr $LoadSF;                                                                    
+                        EndIf;                                                                              
+                                                                                                            
+                     // When Option is taken against record                                                 
+                        ReadC SRCSFL;                                                                       
+                        If Not %EOF;                                                                        
+                           PrvRELRCD = RELRCD;                                                              
+                        EndIf;                                                                              
+                                                                                                            
+                        DoW Not %EOF;                                                                       
+                           If SRCOPT = '4';                                                                 
+                              ExSr $Delete;                                                                 
+                              ExSr $LoadSF;                                                                 
+                           EndIf;                                                                           
+                                                                                                            
+                           SRCOPT = *Blanks;                                                                
+                           Update(E) SRCSFL;                                                                
+                           ReadC SRCSFL;                                                                    
+                        EndDo;                                                                              
+                                                                                                            
+                     Else;                                                                                  
+                        ExSr $ExitPgm;                                                                      
+                     EndIf;                                                                                 
+                                                                                                            
+                  EndDo;                                                                                    
+                                                                                                            
+            // EndIf;                                                                                       
+                                                                                                            
+            EndSr;                                                                                          
+                                                                                                            
+         // ----------------------------------------                                                        
+         // $LoadSubFile - Load Subfile                                                                     
+         // ----------------------------------------                                                        
+            BegSr $LoadSubFile;                                                                             
+                                                                                                            
+               SflClr = *On;                                                                                
+               Write SRCSFLCTL;                                                                             
+               SflClr = *Off;                                                                               
+                                                                                                            
+               SflRRN = 0;                                                                                  
+               PrvRELRCD = 0;                                                                               
+                                                                                                            
+               ExSr $FetchNxt;                                                                              
+               DoW SQLCOD = 0 And SflRRN < 9999;                                                            
+                                                                                                            
+                  SRCOPT = *Blanks;                                                                         
+                  SRCLIB = SLib ;                                                                           
+                  SRCSEQ = SSeq ;                                                                           
+                  SRCTY1 = STy1 ;                                                                           
+                  SRCTY2 = STy2 ;                                                                           
+                  SRCDAT = SDat ;                                                                           
+                                                                                                            
+                  SflRRN += 1;                                                                              
+                  Write SRCSFL;                                                                             
+                                                                                                            
+                  ExSr $FetchNxt;                                                                           
+                                                                                                            
+               EndDo;                                                                                       
+                                                                                                            
+               If SflRRN > 0;                                                                               
+                  SflDsp = *On;                                                                             
+                  SflEnd = *On;                                                                             
+                  FndFlg = *On;                                                                             
+                  RCDNBR = 1;                                                                               
+               Else;                                                                                        
+                  SflDsp = *Off;                                                                            
+                  SflEnd = *Off;                                                                            
+                  FndFlg = *Off;                                                                            
+                  ERRMSG = 'No Records Found‹‹‹';                                                           
+               EndIf;                                                                                       
+                                                                                                            
+            EndSr;                                                                                          
+         // ---------------------------------                                                               
+         // $Add - Add Library                                                                              
+         // ---------------------------------                                                               
+            BegSr $Add;                                                                                     
+                                                                                                            
+               LIBNAM = *Blanks;                                                                            
+               LIBSEQ = *Blanks;                                                                            
+                                                                                                            
+               DoU *In12 = *On;                                                                             
+                                                                                                            
+                  ExFMT WINREC;                                                                             
+                                                                                                            
+                  LIBNAM    = %Trim(%Xlate(LCase:UCase:LIBNAM));                                            
+                  LIBSEQ    = %Trim(LIBSEQ);                                                                
+                  ERRMSG2   = *Blanks;                                                                      
+                                                                                                            
+                  If *In12 = *On;                                                                           
+                     *In12 = *Off;                                                                          
+                     Leave;                                                                                 
+                  EndIf;                                                                                    
+                  If LIBNAM = *Blanks;                                                                      
+                     ERRMSG2 = 'Library Name???';                                                           
+                     Iter;                                                                                  
+                  EndIf;                                                                                    
+                                                                                                            
+                  Wk_ChkFail = *Off;                                                                        
+                  Wk_ChkLib  = *Blanks;                                                                     
+                  ExSr $CheckLib;                                                                           
+                  If Wk_ChkFail = *On;                                                                      
+                     Iter;                                                                                  
+                  EndIf;                                                                                    
+                                                                                                            
+                  Monitor;                                                                                  
+                     If LIBSEQ <> *Blanks;                                                                  
+                        LIBSEQN = %Int(LIBSEQ);                                                             
+                     EndIf;                                                                                 
+                  On-Error;                                                                                 
+                     ERRMSG2 = 'Numeric in Seq Please‹‹‹';                                                  
+                     Iter;                                                                                  
+                  EndMon;                                                                                   
+                  If LIBSEQN < 1 And LIBSEQ <> *Blanks;                                                     
+                     ERRMSG2 = 'Less then 1 Hmmm‹‹‹';                                                       
+                     Iter;                                                                                  
+                  EndIf;                                                                                    
+                                                                                                            
+                  If LIBTY1 <> 'S' And LIBTY1 <> 'O' And LIBTY1 <> 'B';                                     
+                     ERRMSG2 = 'Source Or Object Or Both???';                                               
+                     Iter;                                                                                  
+                  EndIf;                                                                                    
+                                                                                                            
+                  If LIBTY2 <> 'P' And LIBTY2 <> 'D' And LIBTY2 <> 'B';                                     
+                     ERRMSG2 = 'Program Or Data Or Both???';                                                
+                     Iter;                                                                                  
+                  EndIf;                                                                                    
+                                                                                                            
+                  If ERRMSG2 = *Blanks;                                                                     
+                     If LIBSEQN > Wk_MAXSEQ Or LIBSEQ = *Blanks;                                            
+                        LIBSEQN = Wk_MAXSEQ + 1;                                                            
+                     EndIf;                                                                                 
+                     ExSr $Insert;                                                                          
+                     LeaveSr;                                                                               
+                  EndIf;                                                                                    
+                                                                                                            
+              EndDo;                                                                                        
+                                                                                                            
+            EndSr;                                                                                          
+                                                                                                            
+         // ------------------------                                                                        
+         // $ExitPgm - Exit Program                                                                         
+         // ------------------------                                                                        
+            BegSr $ExitPgm;                                                                                 
+                                                                                                            
+               *InLr = *On;                                                                                 
+               Return;                                                                                      
+                                                                                                            
+            EndSr;                                                                                          
+                                                                                                            
+      /End-Free                                                                                             
+     Ç*  // -------------------------------------                                                           
+     Ç*  // $DecCurSor - Declare and Open Cursor                                                            
+     Ç*  // -------------------------------------                                                           
+     C     $DecCurSor    BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  CLOSE SLIBCUR                                                                                      
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  DECLARE SLIBCUR CURSOR FOR                                                                         
+     C+  SELECT DISTINCT LIBSEQ, LIBNAM,                                                                    
+     C+                  LIBTY1, LIBTY2, ADDDT FROM LIBLISTF                                                
+     C+  ORDER BY LIBSEQ, LIBNAM                                                                            
+     C+  FOR FETCH ONLY                                                                                     
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  OPEN SLIBCUR                                                                                       
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C                   EndSr                                                                              
+     Ç*  // ------------------------------------------                                                      
+     Ç*  // $FetchNxt - Fetch next record from cursor                                                       
+     Ç*  // ------------------------------------------                                                      
+     C     $FetchNxt     BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  FETCH SLIBCUR INTO :SRCOBJDS                                                                       
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C                   EndSr                                                                              
+                                                                                                            
+     Ç*  // ------------------------------------------                                                      
+     Ç*  // $CloseCur - Close Cursor                                                                        
+     Ç*  // ------------------------------------------                                                      
+     C     $CloseCur     BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  CLOSE SLIBCUR                                                                                      
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C                   EndSr                                                                              
+                                                                                                            
+     Ç*  // --------------------------------------                                                          
+     Ç*  // $Insert - Insert Library in List File                                                           
+     Ç*  // --------------------------------------                                                          
+     C     $Insert       BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  UPDATE LIBLISTF SET LIBSEQ = LIBSEQ + 1                                                            
+     C+  WHERE LIBSEQ >= :LIBSEQN AND LIBNAM <> :LIBNAM                                                     
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  INSERT INTO LIBLISTF                                                                               
+     C+   VALUES(:LIBSEQN, :LIBNAM, :LIBTY1,                                                                
+     C+          :LIBTY2, CURRENT TIMESTAMP)                                                                
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C                   EndSr                                                                              
+                                                                                                            
+     Ç*  // --------------------------------------                                                          
+     Ç*  // $Delete - Delete Library from File                                                              
+     Ç*  // --------------------------------------                                                          
+     C     $Delete       BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  DELETE FROM LIBLISTF                                                                               
+     C+  WHERE LIBSEQ = :SRCSEQ AND LIBNAM = :SRCLIB                                                        
+     C/END-EXEC                                                                                             
+                                                                                                            
+      /fREE                                                                                                 
+            If SQLCOD = 0;                                                                                  
+               ERRMSG = 'Record Successfully Deleted!!!';                                                   
+            EndIf;                                                                                          
+      /End-fREE                                                                                             
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  UPDATE LIBLISTF SET LIBSEQ = LIBSEQ - 1                                                            
+     C+  WHERE LIBSEQ > :SRCSEQ                                                                             
+     C/END-EXEC                                                                                             
+     C                   EndSr                                                                              
+                                                                                                            
+     Ç*  // -------------------------------------                                                           
+     Ç*  // $CheckLib - Check if Library Exists                                                             
+     Ç*  // -------------------------------------                                                           
+     C     $CheckLib     BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  SELECT LIBNAM INTO :WK_CHKLIB FROM LIBLISTF                                                        
+     C+  WHERE LIBNAM = :LIBNAM                                                                             
+     C/END-EXEC                                                                                             
+                                                                                                            
+      /fREE                                                                                                 
+                                                                                                            
+              If Wk_ChkLib <> *Blanks;                                                                      
+                 ERRMSG2 = 'Library Already In List!!!';                                                    
+                 Wk_ChkFail = *On;                                                                          
+                 LeaveSr;                                                                                   
+              EndIf;                                                                                        
+                                                                                                            
+              Wk_Command = 'DSPOBJD OBJ(' + %Trim(LIBNAM) +                                                 
+              ') OBJTYPE(*LIB)                            +                                                 
+              OUTPUT(*OUTFILE) OUTFILE(QTEMP/LIBINFOF)';                                                    
+                                                                                                            
+              Wk_CmdLen = %Len(Wk_Command);                                                                 
+                                                                                                            
+              CallP(E) RunCmd(Wk_Command:Wk_CmdLen);                                                        
+                                                                                                            
+      /End-fREE                                                                                             
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  SELECT ODOBNM INTO :WK_CHKLIB FROM QTEMP/LIBINFOF                                                  
+     C+  WHERE ODOBNM = :LIBNAM                                                                             
+     C+  FETCH FIRST ROW ONLY                                                                               
+     C/END-EXEC                                                                                             
+                                                                                                            
+      /fREE                                                                                                 
+              If Wk_ChkLib = *Blanks;                                                                       
+                 ERRMSG2 = 'Library Not Found!!!';                                                          
+                 Wk_ChkFail = *On;                                                                          
+                 LeaveSr;                                                                                   
+              EndIf;                                                                                        
+                                                                                                            
+              Wk_MAXSEQ = 0;                                                                                
+                                                                                                            
+      /End-fREE                                                                                             
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  SELECT MAX(LIBSEQ) INTO :Wk_MAXSEQ FROM LIBLISTF                                                   
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C                   EndSr                                                                              
+                                                                                                            
+     Ç*  // -------------------------------------                                                           
+     Ç*  // $SetSqlOpt - Set SQL Options                                                                    
+     Ç*  // -------------------------------------                                                           
+     C     $SetSqlOpt    BegSr                                                                              
+                                                                                                            
+     C/EXEC SQL                                                                                             
+     C+  SET OPTION COMMIT = *NONE                                                                          
+     C/END-EXEC                                                                                             
+                                                                                                            
+     C                   EndSr                                                                              
+     Ç*-----------------------------------------------------------------*/                                  
