@@ -129,9 +129,6 @@ FA LIBLISTP (this will show the source from all the libraries, if present in tha
 You can the then position the cursor on select line and press enter to view the source.
 
 
-## Troubleshooting
-  
-
 ## Authors
 
 Ashish Bagaddeo
