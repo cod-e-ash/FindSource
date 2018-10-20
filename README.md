@@ -27,19 +27,19 @@ CRTSRCPF RPGUTILS
   Display file required for library list program.  
 
   * `LIBLISTCMD`  
-  Command source file.  
+  Command source file.    
 
-  * `VALLSRCC`
-  Driver CL program.
+  * `VALLSRCC`  
+  Driver CL program.  
 
-  * `VALLSRCCMD`
-  Driver command source file.
+  * `VALLSRCCMD`  
+  Driver command source file.  
   
-  * `VALLSRCD`
+  * `VALLSRCD`  
   Display file used by main program.
   
-  * `VALLSRCP`
-  Main program.
+  * `VALLSRCP`  
+  Main program.  
   
   * `CPYBK`  
   A copybook to store prototype definations and other. If you use any other library that RPGUTILS, please change the path in above RPG program/s for this copy book.  
