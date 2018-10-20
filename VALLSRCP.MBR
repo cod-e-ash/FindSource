@@ -1,259 +1,251 @@
-     ‚* Project     : AB Utilities (LIC:xxxxxx)                                                             
-     ‚* Programmer  : Ashish Bagaddeo                                      *                                
-     ‚* Date        : 01/01/2014                                           *                                
-     ‚* Description : This program will search all the libraries and       *                                
-     ‚*               files to find the source members.                    *                                
-     ‚* © Copyright  : iCORE®            mailto: support@icore.co.in       *                                
-     ‚**********************************************************************                                
-     H Debug Option(*NoDebugIO)                                                                             
-     H CopyRight('iCORE® - Ashish Bagaddeo')                                                                
-                                                                                                            
-     ‚* File Specification                                                                                  
-     FVALLSRCD  CF   E             WORKSTN SFILE(SRCSFL:SFLRRN)                                             
-                                                                                                            
-     ‚* Variable Declaration                                                                                
-     DVarDs1           DS                                                                                   
-     D Wk_Command                   300    Inz(*Blanks)                                                     
-     D Wk_CmdLen                     15P 5 Inz(*Zeros)                                                      
-     D SFLRRN                         4  0 Inz(*Zeros)                                                      
-     ‚* Indicators                                                                                          
-     D InKyPtr         S               *   Inz(%ADDR(*IN))                                                  
-     DSubFileInd       DS            99    Based(InKyPtr)                                                   
-     D SflDsp                          N   Overlay(SubFileInd: 30)                                          
-     D SflClr                          N   Overlay(SubFileInd: 31)                                          
-     D SflEnd                          N   Overlay(SubFileInd: 32)                                          
-                                                                                                            
-     ‚* Constants                                                                                           
-     DUCase            C                   CONST('ABCDEFGHIJKLMNOPQRSTUVWXYZ')                              
-     DLCase            C                   CONST('abcdefghijklmnopqrstuvwxyz')                              
-                                                                                                            
-     ‚* Data Structures                                                                                     
-                                                                                                            
-     ‚* Subfile Data Structure                                                                              
-     DSubFileDs        DS                                                                                   
-     DSRCFILE                        10                                                                     
-     DSRCTYPE                        10                                                                     
-     DSRCLIBL                        10                                                                     
-     DSRCDESC                        30                                                                     
-                                                                                                            
-     ‚* Cursor Data Structure                                                                               
-     DSrcFileDS        DS                                                                                   
-     DSFile                          10                                                                     
-     DSLibl                          10                                                                     
-                                                                                                            
-     DMbrRcvVar        DS                                                                                   
-     D BytesRtn                      10I 0                                                                  
-     D BytesSize                     10I 0                                                                  
-     D MFileName                     10                                                                     
-     D MFileLibl                     10                                                                     
-     D MMbrName                      10                                                                     
-     D MFileAttb                     10                                                                     
-     D MSrcType                      10                                                                     
-     D MCrtDateT                     13                                                                     
-     D MLstDateT                     13                                                                     
-     D MMbrDesc                      50                                                                     
-     D MSrcFile                       1                                                                     
-                                                                                                            
-     D ApiErrorDs      DS                  INZ QUALIFIED                                                    
-     D  BYTESPROV                    10I 0 INZ(%SIZE(APIERRORDS.MSGDATA))                                   
-     D  BYTESAVAL                    10I 0                                                                  
-     D  MSGID                         7A                                                                    
-     D  FILLER                        1A                                                                    
-     D  MSGDATA                     256A                                                                    
-                                                                                                            
-     ‚* Prototypes                                                                                          
-     D RtvMbrDsc       PR                  EXTPGM('QUSRMBRD')                                               
-     d  RcvVar                      135A                                                                    
-     d  RcvVarLen                    10I 0 CONST                                                            
-     d  FmtName                       8A   CONST                                                            
-     d  FileName                     20A   CONST                                                            
-     d  MbrName                      10A   CONST                                                            
-     d  OvrProc                       1A   CONST                                                            
-     d  ApiError                    272A                                                                    
-     d  FndMbrProc                    1A   CONST                                                            
-                                                                                                            
-     ‚* Copybooks                                                                                           
-      /Copy AB,FLUTILCB                                                                                     
-                                                                                                            
-     D VALLSRCP        PI                                                                                   
-     D InObjNm                       10                                                                     
-     D FndFlg                          N                                                                    
-                                                                                                            
-      /Free                                                                                                 
-                                                                                                            
-         // ----------------------------------------------------------                                      
-         //                       Program Starts                     -                                      
-         // ----------------------------------------------------------                                      
-                                                                                                            
-         // Set SQL Options                                                                                 
-            Exec SQL                                                                                        
-               SET OPTION COMMIT = *NONE, CLOSQLCSR = *ENDMOD;                                              
-                                                                                                            
-         // Initialize Variables                                                                            
-            InObjNm = %XLate(LCase:UCase:InObjNm);                                                          
-            OBJNAME = InObjNm ;                                                                             
-            FndFlg  = *Off;                                                                                 
-                                                                                                            
-         // Declare Cursor & Open Cursor                                                                    
-            ExSr $DecCurSor;                                                                                
-                                                                                                            
-         // Find all source files and display                                                               
-            Exsr $Display;                                                                                  
-                                                                                                            
-         // Close Cursor                                                                                    
-            ExSr $CloseCur;                                                                                 
-                                                                                                            
-         // Exit Program                                                                                    
-            ExSr $ExitPgm;                                                                                  
-                                                                                                            
-                                                                                                            
-         // ----------------------------------------------------------                                      
-         //                         Subroutines                      -                                      
-         // ----------------------------------------------------------                                      
-                                                                                                            
-         // ----------------------------------------                                                        
-         // $Display - Display Screen                                                                       
-         // ----------------------------------------                                                        
-            BegSr $Display;                                                                                 
-                                                                                                            
-               ExSr $LoadSubFile;                                                                           
-                                                                                                            
-               If SflDsp = *On;                                                                             
-                                                                                                            
-                  DoU *In03 = *On Or *In12 = *On;                                                           
-                     Write HEADER;                                                                          
-                     Write FOOTER;                                                                          
-                     ExFmt SRCSFLCTL;                                                                       
-                                                                                                            
-                     If *In03 <> *On And *In12 <> *On And RELRCD <> 0;                                      
-                        Chain RELRCD SRCSFL;                                                                
-                        ExSr $ShowSource;                                                                   
-                     EndIf;                                                                                 
-                                                                                                            
-                  EndDo;                                                                                    
-                                                                                                            
-               EndIf;                                                                                       
-                                                                                                            
-            EndSr;                                                                                          
-                                                                                                            
-         // ----------------------------------------                                                        
-         // $LoadSubFile - Load Subfile                                                                     
-         // ----------------------------------------                                                        
-            BegSr $LoadSubFile;                                                                             
-               SflClr = *On;                                                                                
-               Write SRCSFLCTL;                                                                             
-               SflClr = *Off;                                                                               
-                                                                                                            
-               SflRRN = 0;                                                                                  
-                                                                                                            
-               ExSr $FetchNxt;                                                                              
-               DoW SQLCOD = 0 And SflRRN < 9999;                                                            
-                  Reset ApiErrorDs;                                                                         
-                  Reset MbrRcvVar;                                                                          
-                  ExSr $RtvMbrDsc;                                                                          
-                                                                                                            
-                  If ApiErrorDs.MsgId = *Blanks;                                                            
-                     SRCFILE = SFile;                                                                       
-                     SRCTYPE = MSrcType;                                                                    
-                     SRCLIBL = SLibl;                                                                       
-                     SRCDESC = MMbrDesc;                                                                    
-                     SflRRN += 1;                                                                           
-                     Write SRCSFL;                                                                          
-                  EndIf;                                                                                    
-                  ExSr $FetchNxt;                                                                           
-               EndDo;                                                                                       
-                                                                                                            
-               If SflRRN > 0;                                                                               
-                  SflDsp = *On;                                                                             
-                  SflEnd = *On;                                                                             
-                  FndFlg = *On;                                                                             
-               EndIf;                                                                                       
-                                                                                                            
-            EndSr;                                                                                          
-                                                                                                            
-         // ----------------------------------------                                                        
-         // $RtvMbrDsc - Retrive Member Description                                                         
-         // ----------------------------------------                                                        
-            BegSr $RtvMbrDsc;                                                                               
-                                                                                                            
-               CallP(E) RtvMbrDsc( MbrRcvVar                                                                
-                              : %Size(MbrRcvVar)                                                            
-                              : 'MBRD0100'                                                                  
-                              : Sfile + SLibl                                                               
-                              : InObjNm                                                                     
-                              : '0'                                                                         
-                              : ApiErrorDS                                                                  
-                              : '1');                                                                       
-                                                                                                            
-            EndSr;                                                                                          
-                                                                                                            
-         // ---------------------------------                                                               
-         // $ShowSource - Show Source Member                                                                
-         // ---------------------------------                                                               
-            BegSr $ShowSource;                                                                              
-                                                                                                            
-               Wk_Command = 'STRSEU' +                                                                      
-                            ' SRCFILE(' + %Trim(SRCLIBL) + '/' +                                            
-                                          %Trim(SRCFILE) + ')' +                                            
-                            ' SRCMBR(' + %Trim(InObjNm ) + ')' +                                            
-                            ' OPTION(5)';                                                                   
-               Wk_CmdLen = %Len(%Trim(Wk_Command));                                                         
-                                                                                                            
-               CallP(E) RunCmd(Wk_Command:Wk_CmdLen);                                                       
-            EndSr;                                                                                          
-                                                                                                            
-         // ------------------------                                                                        
-         // $ExitPgm - Exit Program                                                                         
-         // ------------------------                                                                        
-            BegSr $ExitPgm;                                                                                 
-                                                                                                            
-               *InLr = *On;                                                                                 
-               Return;                                                                                      
-                                                                                                            
-            EndSr;                                                                                          
-                                                                                                            
-      /End-Free                                                                                             
-     ‚*  // -------------------------------------                                                           
-     ‚*  // $DecCurSor - Declare and Open Cursor                                                            
-     ‚*  // -------------------------------------                                                           
-     C     $DecCurSor    BegSr                                                                              
-                                                                                                            
-     C/EXEC SQL                                                                                             
-     C+  CLOSE SFILECUR                                                                                     
-     C/END-EXEC                                                                                             
-                                                                                                            
-     C/EXEC SQL                                                                                             
-     C+  DECLARE SFILECUR CURSOR FOR                                                                        
-     C+  SELECT DBXFIL, LIBNAM FROM LIBLISTF A, QADBXDIC B WHERE                                            
-     C+  A.LIBNAM = B.DBXLIB AND B.DBXTYP = 'S'                                                             
-     C+  AND A.LIBTY1 IN ('S', 'B')                                                                         
-     C+  FOR FETCH ONLY                                                                                     
-     C/END-EXEC                                                                                             
-                                                                                                            
-     C/EXEC SQL                                                                                             
-     C+  OPEN SFILECUR                                                                                      
-     C/END-EXEC                                                                                             
-                                                                                                            
-     C                   EndSr                                                                              
-                                                                                                            
-     ‚*  // ------------------------------------------                                                      
-     ‚*  // $FetchNxt - Fetch next record from cursor                                                       
-     ‚*  // ------------------------------------------                                                      
-     C     $FetchNxt     BegSr                                                                              
-     C/EXEC SQL                                                                                             
-     C+  FETCH SFILECUR INTO :SRCFILEDS                                                                     
-     C/END-EXEC                                                                                             
-                                                                                                            
-     C                   EndSr                                                                              
-                                                                                                            
-     ‚*  // ------------------------------------------                                                      
-     ‚*  // $CloseCur - Close Cursor                                                                        
-     ‚*  // ------------------------------------------                                                      
-     C     $CloseCur     BegSr                                                                              
-                                                                                                            
-     C/EXEC SQL                                                                                             
-     C+  CLOSE SFILECUR                                                                                     
-     C/END-EXEC                                                                                             
-                                                                                                            
-     C                   EndSr                                                                              
-     A*---------------------------------------------------------------------*                               
+     ‚* Project     : AB Utilities                                         *
+     ‚* Programmer  : Ashish Bagaddeo                                      *
+     ‚* Date        : 01/01/2014                                           *
+     ‚* Description : This program will search all the libraries and       *
+     ‚*               files to find the source members.                    *
+     ‚* © Copyright  : iCORE®            mailto: support§icore.co.in       *
+     ‚**********************************************************************
+     H Debug Option(*NoDebugIO)
+     H CopyRight('iCORE® - Ashish Bagaddeo')
+
+     ‚* File Specification
+     FVALLSRCD  CF   E             WORKSTN SFILE(SRCSFL:SFLRRN)
+
+     ‚* Variable Declaration
+     DVarDs1           DS
+     D Wk_Command                   300    Inz(*Blanks)
+     D Wk_CmdLen                     15P 5 Inz(*Zeros)
+     D SFLRRN                         4  0 Inz(*Zeros)
+     ‚* Indicators
+     D InKyPtr         S               *   Inz(%ADDR(*IN))
+     DSubFileInd       DS            99    Based(InKyPtr)
+     D SflDsp                          N   Overlay(SubFileInd: 30)
+     D SflClr                          N   Overlay(SubFileInd: 31)
+     D SflEnd                          N   Overlay(SubFileInd: 32)
+
+     ‚* Constants
+     DUCase            C                   CONST('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+     DLCase            C                   CONST('abcdefghijklmnopqrstuvwxyz')
+
+     ‚* Data Structures
+
+     ‚* Subfile Data Structure
+     DSubFileDs        DS
+     DSRCFILE                        10
+     DSRCTYPE                        10
+     DSRCLIBL                        10
+     DSRCDESC                        30
+
+     ‚* Cursor Data Structure
+     DSrcFileDS        DS
+     DSFile                          10
+     DSLibl                          10
+
+     DMbrRcvVar        DS
+     D BytesRtn                      10I 0
+     D BytesSize                     10I 0
+     D MFileName                     10
+     D MFileLibl                     10
+     D MMbrName                      10
+     D MFileAttb                     10
+     D MSrcType                      10
+     D MCrtDateT                     13
+     D MLstDateT                     13
+     D MMbrDesc                      50
+     D MSrcFile                       1
+
+     ‚* Prototypes
+     D RtvMbrDsc       PR                  EXTPGM('QUSRMBRD')
+     d  RcvVar                      135A
+     d  RcvVarLen                    10I 0 CONST
+     d  FmtName                       8A   CONST
+     d  FileName                     20A   CONST
+     d  MbrName                      10A   CONST
+     d  OvrProc                       1A   CONST
+     d  ApiError                    272A
+     d  FndMbrProc                    1A   CONST
+
+     ‚* Copybooks
+      /Copy RPGUTILS,CPYBK
+
+     D VALLSRCP        PI
+     D InObjNm                       10
+     D FndFlg                          N
+
+      /Free
+
+         // ----------------------------------------------------------
+         //                       Program Starts                     -
+         // ----------------------------------------------------------
+
+         // Set SQL Options
+            Exec SQL
+               SET OPTION COMMIT = *NONE, CLOSQLCSR = *ENDMOD;
+
+         // Initialize Variables
+            InObjNm = %XLate(LCase:UCase:InObjNm);
+            OBJNAME = InObjNm ;
+            FndFlg  = *Off;
+
+         // Declare Cursor & Open Cursor
+            ExSr $DecCurSor;
+
+         // Find all source files and display
+            Exsr $Display;
+
+         // Close Cursor
+            ExSr $CloseCur;
+
+         // Exit Program
+            ExSr $ExitPgm;
+
+
+         // ----------------------------------------------------------
+         //                         Subroutines                      -
+         // ----------------------------------------------------------
+
+         // ----------------------------------------
+         // $Display - Display Screen
+         // ----------------------------------------
+            BegSr $Display;
+
+               ExSr $LoadSubFile;
+
+               If SflDsp = *On;
+
+                  DoU *In03 = *On Or *In12 = *On;
+                     Write HEADER;
+                     Write FOOTER;
+                     ExFmt SRCSFLCTL;
+
+                     If *In03 <> *On And *In12 <> *On And RELRCD <> 0;
+                        Chain RELRCD SRCSFL;
+                        ExSr $ShowSource;
+                     EndIf;
+
+                  EndDo;
+
+               EndIf;
+
+            EndSr;
+
+         // ----------------------------------------
+         // $LoadSubFile - Load Subfile
+         // ----------------------------------------
+            BegSr $LoadSubFile;
+               SflClr = *On;
+               Write SRCSFLCTL;
+               SflClr = *Off;
+
+               SflRRN = 0;
+
+               ExSr $FetchNxt;
+               DoW SQLCOD = 0 And SflRRN < 9999;
+                  Reset ApiErrorDs;
+                  Reset MbrRcvVar;
+                  ExSr $RtvMbrDsc;
+
+                  If ApiErrorDs.MsgId = *Blanks;
+                     SRCFILE = SFile;
+                     SRCTYPE = MSrcType;
+                     SRCLIBL = SLibl;
+                     SRCDESC = MMbrDesc;
+                     SflRRN += 1;
+                     Write SRCSFL;
+                  EndIf;
+                  ExSr $FetchNxt;
+               EndDo;
+
+               If SflRRN > 0;
+                  SflDsp = *On;
+                  SflEnd = *On;
+                  FndFlg = *On;
+               EndIf;
+
+            EndSr;
+
+         // ----------------------------------------
+         // $RtvMbrDsc - Retrive Member Description
+         // ----------------------------------------
+            BegSr $RtvMbrDsc;
+
+               CallP(E) RtvMbrDsc( MbrRcvVar
+                              : %Size(MbrRcvVar)
+                              : 'MBRD0100'
+                              : Sfile + SLibl
+                              : InObjNm
+                              : '0'
+                              : ApiErrorDS
+                              : '1');
+
+            EndSr;
+
+         // ---------------------------------
+         // $ShowSource - Show Source Member
+         // ---------------------------------
+            BegSr $ShowSource;
+
+               Wk_Command = 'STRSEU' +
+                            ' SRCFILE(' + %Trim(SRCLIBL) + '/' +
+                                          %Trim(SRCFILE) + ')' +
+                            ' SRCMBR(' + %Trim(InObjNm ) + ')' +
+                            ' OPTION(5)';
+               Wk_CmdLen = %Len(%Trim(Wk_Command));
+
+               CallP(E) RunCmd(Wk_Command:Wk_CmdLen);
+            EndSr;
+
+         // ------------------------
+         // $ExitPgm - Exit Program
+         // ------------------------
+            BegSr $ExitPgm;
+
+               *InLr = *On;
+               Return;
+
+            EndSr;
+
+      /End-Free
+     ‚*  // -------------------------------------
+     ‚*  // $DecCurSor - Declare and Open Cursor
+     ‚*  // -------------------------------------
+     C     $DecCurSor    BegSr
+
+     C/EXEC SQL
+     C+  CLOSE SFILECUR
+     C/END-EXEC
+
+     C/EXEC SQL
+     C+  DECLARE SFILECUR CURSOR FOR
+     C+  SELECT DBXFIL, LIBNAM FROM LIBLISTF A, QADBXDIC B WHERE
+     C+  A.LIBNAM = B.DBXLIB AND B.DBXTYP = 'S'
+     C+  AND A.LIBTY1 IN ('S', 'B')
+     C+  FOR FETCH ONLY
+     C/END-EXEC
+
+     C/EXEC SQL
+     C+  OPEN SFILECUR
+     C/END-EXEC
+
+     C                   EndSr
+
+     ‚*  // ------------------------------------------
+     ‚*  // $FetchNxt - Fetch next record from cursor
+     ‚*  // ------------------------------------------
+     C     $FetchNxt     BegSr
+     C/EXEC SQL
+     C+  FETCH SFILECUR INTO :SRCFILEDS
+     C/END-EXEC
+
+     C                   EndSr
+
+     ‚*  // ------------------------------------------
+     ‚*  // $CloseCur - Close Cursor
+     ‚*  // ------------------------------------------
+     C     $CloseCur     BegSr
+
+     C/EXEC SQL
+     C+  CLOSE SFILECUR
+     C/END-EXEC
+
+     C                   EndSr

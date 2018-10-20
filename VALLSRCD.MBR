@@ -1,63 +1,63 @@
-    ‚‚* Project      : AB Utilities        (LIC:xxxxxx)                     *                               
-    ‚‚* Programmer   : Ashish Bagaddeo                                      *                               
-    ‚‚* Date         : 16/04/2014                                           *                               
-    ‚‚* Description  : Display File to view all sources                     *                               
-    ‚‚*                Program VALLSRCP                                     *                               
-    ‚‚* × Copyright  : iCORE®                  mailto: support@icore.co.in  *                               
-    ‚‚*---------------------------------------------------------------------*                               
-     A                                      DSPSIZ(24 80 *DS3)                                              
-     A                                      CA03(03)                                                        
-     A                                      CA12(12)                                                        
-     ‚*---------------------------------------------------------------------*                               
-     A          R HEADER                                                                                    
-     ‚*---------------------------------------------------------------------*                               
-     A                                  2  2USER                                                            
-     A*                                     COLOR(WHT)                                                      
-     A                                  2 33'VIEW ALL SOURCE'                                               
-     A                                      COLOR(WHT)                                                      
-     A                                  2 72DATE                                                            
-     A                                      EDTCDE(Y)                                                       
-     A*                                     COLOR(WHT)                                                      
-     A                                  3 72TIME                                                            
-     A*                                     COLOR(WHT)                                                      
-     A                                  4  2'SOURCE:'                                                       
-     A            OBJNAME       10   O  4 10                                                                
-     A                                      COLOR(RED)                                                      
-     A                                  6  2'POSITION CURSOR, PRESS ENTER.'                                 
-     A                                      COLOR(BLU)                                                      
-     A                                  8  2'SOURCE FILE'                                                   
-     A                                      COLOR(WHT)                                                      
-     A                                  8 15'TYPE'                                                          
-     A                                      COLOR(WHT)                                                      
-     A                                  8 27'LIBRARY'                                                       
-     A                                      COLOR(WHT)                                                      
-     A                                  8 39'DESCRIPTION'                                                   
-     A                                      COLOR(WHT)                                                      
-     ‚*---------------------------------------------------------------------*                               
-     A          R SRCSFL                    SFL                                                             
-     ‚*---------------------------------------------------------------------*                               
-     A            SRCFILE       10   O  9  2                                                                
-     A            SRCTYPE       10   O  9 15                                                                
-     A            SRCLIBL       10   O  9 27                                                                
-     A            SRCDESC       30   O  9 39                                                                
-     ‚*---------------------------------------------------------------------*                               
-     A          R SRCSFLCTL                 SFLCTL(SRCSFL)                                                  
-     ‚*---------------------------------------------------------------------*                               
-     A                                      OVERLAY                                                         
-     A  30                                  SFLDSP                                                          
-     A                                      SFLDSPCTL                                                       
-     A  31                                  SFLCLR                                                          
-     A  32                                  SFLEND(*MORE)                                                   
-     A                                      SFLCSRRRN(&RELRCD)                                              
-     A                                      SFLSIZ(0020)                                                    
-     A                                      SFLPAG(0010)                                                    
-     A            RELRCD         5S 0H                                                                      
-     ‚*---------------------------------------------------------------------*                               
-     A          R FOOTER                                                                                    
-     ‚*---------------------------------------------------------------------*                               
-     A                                      OVERLAY                                                         
-     A                                 22  2'F3=EXIT'                                                       
-     A                                      COLOR(BLU)                                                      
-     A                                 22 11'F12=CANCEL'                                                    
-     A                                      COLOR(BLU)                                                      
-     ‚**********************************************************************                                
+    ‚‚* Project      : AB Utilities        (LIC:xxxxxx)                     *
+    ‚‚* Programmer   : Ashish Bagaddeo                                      *
+    ‚‚* Date         : 16/04/2014                                           *
+    ‚‚* Description  : Display File to view all sources                     *
+    ‚‚*                Program VALLSRCP                                     *
+    ‚‚* © Copyright  : iCORE®                  mailto: support§icore.co.in  *
+    ‚‚*---------------------------------------------------------------------*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      CA03(03)
+     A                                      CA12(12)
+     ‚*---------------------------------------------------------------------*
+     A          R HEADER
+     ‚*---------------------------------------------------------------------*
+     A                                  2  2USER
+     A*                                     COLOR(WHT)
+     A                                  2 33'VIEW ALL SOURCE'
+     A                                      COLOR(WHT)
+     A                                  2 72DATE
+     A                                      EDTCDE(Y)
+     A*                                     COLOR(WHT)
+     A                                  3 72TIME
+     A*                                     COLOR(WHT)
+     A                                  4  2'SOURCE:'
+     A            OBJNAME       10   O  4 10
+     A                                      COLOR(RED)
+     A                                  6  2'POSITION CURSOR, PRESS ENTER.'
+     A                                      COLOR(BLU)
+     A                                  8  2'SOURCE FILE'
+     A                                      COLOR(WHT)
+     A                                  8 15'TYPE'
+     A                                      COLOR(WHT)
+     A                                  8 27'LIBRARY'
+     A                                      COLOR(WHT)
+     A                                  8 39'DESCRIPTION'
+     A                                      COLOR(WHT)
+     ‚*---------------------------------------------------------------------*
+     A          R SRCSFL                    SFL
+     ‚*---------------------------------------------------------------------*
+     A            SRCFILE       10   O  9  2
+     A            SRCTYPE       10   O  9 15
+     A            SRCLIBL       10   O  9 27
+     A            SRCDESC       30   O  9 39
+     ‚*---------------------------------------------------------------------*
+     A          R SRCSFLCTL                 SFLCTL(SRCSFL)
+     ‚*---------------------------------------------------------------------*
+     A                                      OVERLAY
+     A  30                                  SFLDSP
+     A                                      SFLDSPCTL
+     A  31                                  SFLCLR
+     A  32                                  SFLEND(*MORE)
+     A                                      SFLCSRRRN(&RELRCD)
+     A                                      SFLSIZ(0020)
+     A                                      SFLPAG(0010)
+     A            RELRCD         5S 0H
+     ‚*---------------------------------------------------------------------*
+     A          R FOOTER
+     ‚*---------------------------------------------------------------------*
+     A                                      OVERLAY
+     A                                 22  2'F3=EXIT'
+     A                                      COLOR(BLU)
+     A                                 22 11'F12=CANCEL'
+     A                                      COLOR(BLU)
+     A                                 24 63'© Ashish Bagaddeo'

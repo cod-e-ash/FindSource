@@ -1,9 +1,8 @@
-/* PROJECT     : AB UTILITIES (LIC:XXXXXX)                                  */                              
-/* PROGRAMMER  : ASHISH BAGADDEO                                            */                              
-/* DATE        : 01/01/2014                                                 */                              
-/* DESCRIPTION : COMMAND FILE                                               */                              
-/* © COPYRIGHT : ICORE®            MAILTO: SUPPORT@ICORE.CO.IN              */                              
-/*--------------------------------------------------------------------------*/                              
-             CMD        PROMPT('LIBRARY LIST MAINTAINANCE')                                                 
-             PARM       KWD(ERRFLG) TYPE(*CHAR) LEN(1) CONSTANT('0')                                        
-     A*---------------------------------------------------------------------*                               
+/* PROJECT     : AB UTILITIES                                               */
+/* PROGRAMMER  : ASHISH BAGADDEO                                            */
+/* DATE        : 01/01/2014                                                 */
+/* DESCRIPTION : COMMAND FILE                                               */
+/* © COPYRIGHT : ICORE®            MAILTO: SUPPORT§ICORE.CO.IN              */
+/*--------------------------------------------------------------------------*/
+             CMD        PROMPT('LIBRARY LIST MAINTAINANCE')
+             PARM       KWD(ERRFLG) TYPE(*CHAR) LEN(1) CONSTANT('0')
